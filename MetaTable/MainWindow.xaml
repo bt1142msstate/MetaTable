@@ -1,0 +1,652 @@
+﻿<Window x:Class="MetaTable.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MetaTable"
+        mc:Ignorable="d"        Title="MetaTable - File Metadata Extractor" 
+        Width="1100" MinWidth="800" MinHeight="600"
+        WindowStartupLocation="CenterScreen" 
+        Background="#FF252526"        FontFamily="Segoe UI" FontSize="12"
+        Icon="Logo.ico">
+
+    <Window.Resources>
+        <!-- Dark theme brushes -->
+        <SolidColorBrush x:Key="DarkBackgroundBrush" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="DarkPanelBrush" Color="#252526"/>
+        <SolidColorBrush x:Key="DarkGroupBoxBackground" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="DarkBorderBrush" Color="#3F3F46"/>
+        <SolidColorBrush x:Key="LightForegroundBrush" Color="#CCCCCC"/>
+        <SolidColorBrush x:Key="SubtleForegroundBrush" Color="#AAAAAA"/>
+
+        <!-- Global TextBlock style for dark mode -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+        </Style>
+        <!-- ModernButton style remains accent -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#660000"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#800000"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#4D0000"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#CCCCCC"/>
+                                <Setter Property="Foreground" Value="#666666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernGroupBox" TargetType="GroupBox">
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}"/>
+            <Setter Property="Background" Value="{StaticResource DarkGroupBoxBackground}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Border Background="{StaticResource DarkGroupBoxBackground}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    CornerRadius="6" Margin="0,8,0,0">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="2" Opacity="0.5"/>
+                                </Border.Effect>
+                            </Border>
+                            <ContentPresenter Margin="16,20,16,16"/>
+                            <Border Background="{StaticResource DarkGroupBoxBackground}"
+                                    BorderBrush="{StaticResource DarkBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Margin="12,0,0,0"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Left">
+                                <Label Content="{TemplateBinding Header}"
+                                       Foreground="{StaticResource LightForegroundBrush}"
+                                       FontWeight="SemiBold"
+                                       Background="Transparent"
+                                       Padding="12,4"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ModernProgressBar" TargetType="ProgressBar">
+            <Setter Property="Background" Value="{StaticResource SubtleForegroundBrush}"/>
+            <Setter Property="Foreground" Value="#660000"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <Grid>
+                                <Border Name="PART_Track" Background="{TemplateBinding Background}" CornerRadius="4"/>
+                                <Border Name="PART_Indicator" 
+                                        Background="{TemplateBinding Foreground}" 
+                                        CornerRadius="4"
+                                        HorizontalAlignment="Left"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>        <!-- Dark TextBox -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource DarkGroupBoxBackground}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#4A9EFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Editable TextBox for output file -->
+        <Style x:Key="EditableTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource DarkGroupBoxBackground}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>        <!-- Custom ToolTip Style for immediate appearance -->
+        <Style x:Key="InstantToolTip" TargetType="ToolTip">
+            <Setter Property="Background" Value="{StaticResource DarkGroupBoxBackground}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Placement" Value="Bottom"/>
+            <Setter Property="VerticalOffset" Value="5"/>
+            <Setter Property="HorizontalOffset" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000" BlurRadius="6" ShadowDepth="2" Opacity="0.7"/>
+                            </Border.Effect>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>        <!-- Dark CheckBox with rounded corners -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Checkbox border with rounded corners -->
+                            <Border x:Name="CheckBoxBorder" 
+                                    Grid.Column="0"
+                                    Width="16" Height="16" 
+                                    Background="{StaticResource DarkGroupBoxBackground}"
+                                    BorderBrush="{StaticResource DarkBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center">
+                                
+                                <!-- Checkmark -->
+                                <Path x:Name="CheckMark"
+                                      Data="M2,6 L6,10 L14,2"
+                                      Stroke="White"
+                                      StrokeThickness="2"
+                                      Visibility="Collapsed"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"/>
+                            </Border>
+                            
+                            <!-- Content -->
+                            <ContentPresenter Grid.Column="1" 
+                                            VerticalAlignment="Center"
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                        </Grid>
+                        
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="#660000"/>
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#800000"/>
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="BorderBrush" Value="#4A9EFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="CheckBoxBorder" Property="Background" Value="{StaticResource DarkBorderBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ListView styles -->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="{StaticResource DarkPanelBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+        </Style>
+        <Style TargetType="ListViewItem">
+            <Setter Property="Background" Value="{StaticResource DarkPanelBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource DarkGroupBoxBackground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>        <!-- GridView Column Headers -->
+        <Style TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="Background" Value="{StaticResource DarkGroupBoxBackground}"/>
+            <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Padding" Value="4,2"/>
+        </Style>        <!-- Scanning Animation Storyboards -->
+        <Storyboard x:Key="ScanningAnimation" RepeatBehavior="Forever">
+            <!-- File icon movement: slide in from left, pause for scanning, slide out to right -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="FileIconTransform" 
+                                          Storyboard.TargetProperty="X"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="-200"/>    <!-- Start off-screen left -->
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0"/>       <!-- Move to center position -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>       <!-- Stay for scanning -->
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="200"/>     <!-- Move off-screen right -->
+            </DoubleAnimationUsingKeyFrames>
+            
+            <!-- File icon opacity: fade in, stay visible during scan, fade out -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ScanningFileIcon" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+              <!-- Magnifying glass X movement: subtle side-to-side examination -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MagnifyingGlassTransform" 
+                                          Storyboard.TargetProperty="X"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.3" Value="-15"/>    <!-- Move slightly left -->
+                <LinearDoubleKeyFrame KeyTime="0:0:1.8" Value="20"/>     <!-- Move to right -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.3" Value="-10"/>    <!-- Back to left -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.8" Value="0"/>      <!-- Return to center -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            
+            <!-- Magnifying glass Y movement: up and down examination -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MagnifyingGlassTransform" 
+                                          Storyboard.TargetProperty="Y"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.2" Value="-25"/>    <!-- Move up -->
+                <LinearDoubleKeyFrame KeyTime="0:0:1.6" Value="15"/>     <!-- Move down -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.0" Value="-20"/>    <!-- Move up again -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.4" Value="25"/>     <!-- Move down more -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.8" Value="0"/>      <!-- Return to center -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            
+            <!-- Magnifying glass rotation: tilting for examination -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MagnifyingGlassRotation" 
+                                          Storyboard.TargetProperty="Angle"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.3" Value="-15"/>    <!-- Tilt left -->
+                <LinearDoubleKeyFrame KeyTime="0:0:1.8" Value="20"/>     <!-- Tilt right -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.3" Value="-10"/>    <!-- Tilt left again -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.8" Value="0"/>      <!-- Return to normal -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+              <!-- Magnifying glass opacity: appears during scanning phase -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MagnifyingGlass" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.2" Value="1"/>     <!-- Fade in for scanning -->
+                <LinearDoubleKeyFrame KeyTime="0:0:2.8" Value="1"/>     <!-- Stay visible during scan -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>       <!-- Fade out -->
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+              <!-- Metadata container animations - showing data extraction -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MetadataContainer" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.3" Value="1"/>     <!-- Container appears when scanning starts -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>       <!-- Stay visible during scanning -->
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>       <!-- Fade out with file -->
+            </DoubleAnimationUsingKeyFrames>
+            
+            <!-- Metadata line animations - each line appears sequentially -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MetadataLine1" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.5" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.7" Value="1"/>     <!-- First line appears -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MetadataLine2" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:1.8" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.0" Value="1"/>     <!-- Second line appears -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MetadataLine3" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.1" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.3" Value="1"/>     <!-- Third line appears -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MetadataLine4" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.4" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.6" Value="1"/>     <!-- Fourth line appears -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MetadataLine5" 
+                                          Storyboard.TargetProperty="Opacity"
+                                          Duration="0:0:4">
+                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.7" Value="0"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:2.9" Value="1"/>     <!-- Fifth line appears -->
+                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="1"/>
+                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources><ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Background="{StaticResource DarkPanelBrush}" Margin="0,20,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+        <!-- Title Header -->
+        <Border Grid.Row="0" Margin="0,-20,0,0" Padding="20" CornerRadius="0,0,12,12">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#660000" Offset="0"/>
+                    <GradientStop Color="#800000" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>            <Grid>                <!-- SVG Icon in left corner -->
+                <Viewbox Width="50" Height="50" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                    <Viewbox.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="-21.698"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Viewbox.RenderTransform>
+                    <Canvas Width="512" Height="512">
+                        <Path Fill="White" Data="M490.39,182.75c-5.55-13.19-14.77-22.7-26.67-27.49l-.16-.06a46.46,46.46,0,0,0-17-3.2h-.64c-27.24.41-55.05,23.56-69.19,57.61-10.37,24.9-11.56,51.68-3.18,71.64,5.54,13.2,14.78,22.71,26.73,27.5l.13.05a46.53,46.53,0,0,0,17,3.2c27.5,0,55.6-23.15,70-57.65C497.65,229.48,498.78,202.72,490.39,182.75Z"/>
+                        <Path Fill="White" Data="M381.55,329.61c-15.71-9.44-30.56-18.37-40.26-34.41C314.53,250.8,298.37,224,256,224s-58.57,26.8-85.39,71.2c-9.72,16.06-24.6,25-40.36,34.48-18.07,10.86-36.74,22.08-44.8,44.16a66.93,66.93,0,0,0-4.65,25c0,35.95,28,65.2,62.4,65.2,17.75,0,36.64-6.15,56.63-12.66,19.22-6.26,39.09-12.73,56.27-12.73s37,6.47,56.15,12.73C332.2,457.85,351,464,368.8,464c34.35,0,62.3-29.25,62.3-65.2a67,67,0,0,0-4.75-25C418.29,351.7,399.61,340.47,381.55,329.61Z"/>
+                        <Path Fill="White" Data="M150,188.85c11.9,14.93,27,23.15,42.52,23.15a42.88,42.88,0,0,0,6.33-.47c32.37-4.76,52.54-44.26,45.92-90C242,102.3,234.6,84.39,224,71.11,212.12,56.21,197,48,181.49,48a42.88,42.88,0,0,0-6.33.47c-32.37,4.76-52.54,44.26-45.92,90C132,157.67,139.4,175.56,150,188.85Z"/>
+                        <Path Fill="White" Data="M313.16,211.53a42.88,42.88,0,0,0,6.33.47c15.53,0,30.62-8.22,42.52-23.15,10.59-13.29,17.95-31.18,20.75-50.4h0c6.62-45.72-13.55-85.22-45.92-90a42.88,42.88,0,0,0-6.33-.47C315,48,299.88,56.21,288,71.11c-10.6,13.28-18,31.19-20.76,50.44C260.62,167.27,280.79,206.77,313.16,211.53Z"/>
+                        <Path Fill="White" Data="M111.59,308.8l.14-.05c11.93-4.79,21.16-14.29,26.69-27.48,8.38-20,7.2-46.75-3.15-71.65C120.94,175.16,92.85,152,65.38,152a46.4,46.4,0,0,0-17,3.2l-.14.05C36.34,160,27.11,169.54,21.58,182.73c-8.38,20-7.2,46.75,3.15,71.65C39.06,288.84,67.15,312,94.62,312A46.4,46.4,0,0,0,111.59,308.8Z"/>
+                    </Canvas>
+                </Viewbox>                <!-- Centered title content -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="📊 MetaTable" 
+                               FontSize="28" FontWeight="Bold" 
+                               Foreground="White" 
+                               HorizontalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="Metadata Extraction Tool" 
+                               FontSize="14" 
+                               Foreground="#FFB3B3" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,4,0,0"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Grid>
+        </Border>        <!-- Folder Selection -->
+        <GroupBox Grid.Row="1" Header="📁 Folder Selection" Style="{StaticResource ModernGroupBox}" Margin="10,10,10,10">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>                <TextBox x:Name="FolderPathTextBox" Grid.Column="0" Height="32"
+                         Style="{StaticResource ModernTextBox}"
+                         Margin="0,0,15,0" TextChanged="FolderPathTextBox_TextChanged" FontSize="10"
+                         MouseDoubleClick="FolderPathTextBox_MouseDoubleClick" Cursor="Hand"
+                         ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">                    <TextBox.ToolTip>
+                        <ToolTip Style="{StaticResource InstantToolTip}" 
+                                 Content="📁 Double-click to open this folder in File Explorer"
+                                 Placement="Bottom"
+                                 VerticalOffset="8"/>
+                    </TextBox.ToolTip>
+                </TextBox>                <Button x:Name="SelectFolderButton" Grid.Column="1" Content="Select Folder to Scan" 
+                        Style="{StaticResource ModernButton}"
+                        MinWidth="150" Height="32" Click="SelectFolderButton_Click"
+                        ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">                    <Button.ToolTip>
+                        <ToolTip Style="{StaticResource InstantToolTip}" 
+                                 Content="📂 Browse and select a folder to scan for files"
+                                 Placement="Bottom"
+                                 VerticalOffset="8"/>
+                    </Button.ToolTip>
+                </Button>
+            </Grid>
+        </GroupBox>        <!-- Progress Panel Only -->
+        <GroupBox Grid.Row="2" Header="⚡ Progress &amp; Actions" Style="{StaticResource ModernGroupBox}" Margin="10,10,10,10">
+            <Grid Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Status Information -->
+                <Border Grid.Row="0" Background="{StaticResource DarkGroupBoxBackground}" Padding="0,12,12,5" CornerRadius="6">
+                    <StackPanel>
+                        <TextBlock x:Name="StatusTextBlock" Text="Ready to scan" 
+                                       FontWeight="SemiBold" Margin="0,0,0,8"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <ProgressBar Grid.Row="1" x:Name="ProgressBar" Style="{StaticResource ModernProgressBar}" 
+                                 Margin="0,15,0,15">
+                    <ProgressBar.RenderTransform>
+                        <ScaleTransform ScaleY="1"/>
+                    </ProgressBar.RenderTransform>
+                </ProgressBar>                <!-- Action Buttons -->
+                <Button Grid.Row="2" x:Name="ScanButton" Content="🔍 Scan Files and Export Data to Excel" 
+                            Style="{StaticResource ModernButton}" Height="40" Click="ScanButton_Click" 
+                            Margin="0,0,0,15"
+                            ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">                    <Button.ToolTip>
+                        <ToolTip Style="{StaticResource InstantToolTip}" 
+                                 Content="🚀 Start scanning or click again during scan to cancel"
+                                 Placement="Bottom"
+                                 VerticalOffset="8"/>
+                    </Button.ToolTip>
+                </Button><!-- Scanning Animation - Takes all remaining space and centers vertically -->
+                <Grid Grid.Row="3" x:Name="ScanAnimation" Visibility="Collapsed">
+                    <Border Background="{StaticResource DarkGroupBoxBackground}" CornerRadius="6" Opacity="0.9">
+                        <!-- Centered container for the animation -->
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Viewbox Stretch="Uniform">
+                                <Canvas Width="500" Height="150" ClipToBounds="True"><!-- Metadata extraction container on the left -->
+                                    <Border x:Name="MetadataContainer" Canvas.Left="20" Canvas.Top="25" 
+                                           Width="150" Height="100" 
+                                           Background="{StaticResource DarkGroupBoxBackground}" 
+                                           CornerRadius="4" Opacity="0" BorderBrush="White" BorderThickness="2">
+                                        <StackPanel Margin="8">
+                                            <TextBlock Text="📊 Extracting..." FontSize="10" FontWeight="Bold" 
+                                                      Foreground="White" Margin="0,0,0,4"/>
+                                            
+                                            <TextBlock x:Name="MetadataLine1" Text="📁 Size: 2.4 MB" FontSize="8" 
+                                                      FontFamily="Consolas" Foreground="White" Opacity="0" Margin="0,1"/>
+                                            <TextBlock x:Name="MetadataLine2" Text="📅 Modified: 2025-06-21" FontSize="8" 
+                                                      FontFamily="Consolas" Foreground="White" Opacity="0" Margin="0,1"/>
+                                            <TextBlock x:Name="MetadataLine3" Text="🏷️ Type: Document" FontSize="8" 
+                                                      FontFamily="Consolas" Foreground="White" Opacity="0" Margin="0,1"/>
+                                            <TextBlock x:Name="MetadataLine4" Text="👤 Author: User" FontSize="8" 
+                                                      FontFamily="Consolas" Foreground="White" Opacity="0" Margin="0,1"/>
+                                            <TextBlock x:Name="MetadataLine5" Text="📐 Dimensions: 1920x1080" FontSize="8" 
+                                                      FontFamily="Consolas" Foreground="White" Opacity="0" Margin="0,1"/>
+                                        </StackPanel>
+                                    </Border>
+                                    
+                                    <!-- Single file icon that gets animated -->
+                                    <TextBlock x:Name="ScanningFileIcon" Text="📄" FontSize="64" 
+                                              Canvas.Left="218" Canvas.Top="43"
+                                              Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock.RenderTransform>
+                                            <TranslateTransform x:Name="FileIconTransform"/>
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>                                      <!-- Magnifying glass that moves over the file -->
+                                    <TextBlock x:Name="MagnifyingGlass" Text="🔍" FontSize="80" 
+                                              Canvas.Left="218" Canvas.Top="43"
+                                              Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Foreground="White">
+                                        <TextBlock.RenderTransform>
+                                            <TransformGroup>
+                                                <TranslateTransform x:Name="MagnifyingGlassTransform"/>
+                                                <RotateTransform x:Name="MagnifyingGlassRotation" CenterX="40" CenterY="40"/>
+                                            </TransformGroup>
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                </Canvas>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </GroupBox><!-- Export Options -->
+        <GroupBox Grid.Row="3" Header="⚙️ Export Options" Style="{StaticResource ModernGroupBox}" Margin="10,10,10,10">
+            <StackPanel Margin="15">                <!-- Checkboxes with wrapping -->
+                <WrapPanel Orientation="Horizontal" Margin="0,0,0,15">                    <CheckBox x:Name="IncludeHiddenFilesCheckBox" Content="Include hidden files" 
+                              IsChecked="False" Margin="0,0,25,8" FontWeight="Medium"
+                              ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">                        <CheckBox.ToolTip>
+                            <ToolTip Style="{StaticResource InstantToolTip}" 
+                                     Content="👁️ Include files marked as hidden in the scan results"
+                                     Placement="Bottom"
+                                     VerticalOffset="5"/>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <CheckBox x:Name="IncludeSystemFilesCheckBox" Content="Include system files" 
+                              IsChecked="False" Margin="0,0,25,8" FontWeight="Medium"
+                              ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">
+                        <CheckBox.ToolTip>
+                            <ToolTip Style="{StaticResource InstantToolTip}" 
+                                     Content="⚙️ Include system files in the scan results"
+                                     Placement="Bottom"
+                                     VerticalOffset="5"/>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <CheckBox x:Name="IncludeHyperlinksCheckBox" Content="Include file hyperlinks" 
+                              IsChecked="True" Margin="0,0,25,8" FontWeight="Medium"
+                              ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">
+                        <CheckBox.ToolTip>
+                            <ToolTip Style="{StaticResource InstantToolTip}" 
+                                     Content="🔗 Add clickable hyperlinks to files in the Excel output"
+                                     Placement="Bottom"
+                                     VerticalOffset="5"/>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                </WrapPanel>
+                <!-- Output file selection with responsive grid -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>                    <TextBox x:Name="OutputFileTextBox" Grid.Column="0" Height="40"
+                             Style="{StaticResource ModernTextBox}" VerticalAlignment="Center" Margin="0,0,10,0"
+                             MouseDoubleClick="OutputFileTextBox_MouseDoubleClick" Cursor="Hand"
+                             ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">                        <TextBox.ToolTip>
+                            <ToolTip Style="{StaticResource InstantToolTip}" 
+                                     Content="📄 Double-click to open containing folder in File Explorer"
+                                     Placement="Bottom"
+                                     VerticalOffset="8"/>
+                        </TextBox.ToolTip>
+                    </TextBox>                    <Button x:Name="BrowseOutputButton" Grid.Column="1" Content="Select Output File" 
+                            Style="{StaticResource ModernButton}"
+                            MinWidth="150" Height="40" Click="BrowseOutputButton_Click"
+                            ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="5000">                        <Button.ToolTip>
+                            <ToolTip Style="{StaticResource InstantToolTip}" 
+                                     Content="💾 Choose where to save the Excel file with extracted metadata"
+                                     Placement="Bottom"
+                                     VerticalOffset="8"/>
+                        </Button.ToolTip>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </GroupBox>        <!-- Modern Status Bar -->
+        <Border Grid.Row="4" Background="{StaticResource DarkGroupBoxBackground}" 
+                BorderBrush="{StaticResource DarkBorderBrush}" BorderThickness="1" CornerRadius="6" Height="35" Margin="10,0,10,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                <Ellipse Width="8" Height="8" Fill="#28A745" Margin="0,0,8,0"/>
+                <TextBlock x:Name="StatusBarText" Text="Ready to scan files" 
+                           FontWeight="Medium" Foreground="{StaticResource LightForegroundBrush}"/>
+            </StackPanel>
+        </Border>
+        </Grid>
+    </ScrollViewer>
+</Window>
