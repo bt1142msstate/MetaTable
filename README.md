@@ -2,6 +2,8 @@
 
 A modern WPF desktop application for Windows that scans files in a directory and exports comprehensive metadata to Excel.
 
+![MetaTable Screenshot](screenshots/main-window.png)
+
 ## Features
 
 - 🔍 **Recursive File Scanning** - Scans all files in selected folder and subfolders
