@@ -4,7 +4,7 @@ A modern WPF desktop application for Windows that scans files in a directory and
 
 ![MetaTable Screenshot](screenshots/main-window.png)
 
-> **Note:** The screenshot shows MSU (Mississippi State University) branding, as this was created by an MSU graduate student. The branding can be easily removed or customized by replacing the icon and color scheme in the source code.
+> **Note:** The screenshot shows MSU (Mississippi State University) branding. The branding can be easily removed or customized by replacing the icon and color scheme in the source code.
 
 ## Features
 
