@@ -5,6 +5,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows-0078D4)](https://www.microsoft.com/windows)
 [![C#](https://img.shields.io/badge/C%23-12-239120)](https://docs.microsoft.com/en-us/dotnet/csharp/)
 [![WPF](https://img.shields.io/badge/UI-WPF-512BD4)](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/)
+[![GitHub release](https://img.shields.io/github/v/release/bt1142msstate/MetaTable)](https://github.com/bt1142msstate/MetaTable/releases)
 [![GitHub issues](https://img.shields.io/github/issues/bt1142msstate/MetaTable)](https://github.com/bt1142msstate/MetaTable/issues)
 [![GitHub stars](https://img.shields.io/github/stars/bt1142msstate/MetaTable)](https://github.com/bt1142msstate/MetaTable/stargazers)
 
