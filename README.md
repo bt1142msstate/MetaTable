@@ -1,5 +1,13 @@
 # MetaTable
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/)
+[![Platform](https://img.shields.io/badge/Platform-Windows-0078D4)](https://www.microsoft.com/windows)
+[![C#](https://img.shields.io/badge/C%23-12-239120)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![WPF](https://img.shields.io/badge/UI-WPF-512BD4)](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/)
+[![GitHub issues](https://img.shields.io/github/issues/bt1142msstate/MetaTable)](https://github.com/bt1142msstate/MetaTable/issues)
+[![GitHub stars](https://img.shields.io/github/stars/bt1142msstate/MetaTable)](https://github.com/bt1142msstate/MetaTable/stargazers)
+
 A modern WPF desktop application for Windows that scans files in a directory and exports comprehensive metadata to Excel.
 
 ![MetaTable Screenshot](screenshots/main-window.png)
