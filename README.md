@@ -72,7 +72,7 @@ dotnet publish MetaTable/MetaTable.csproj -c Release -r win-x64 --self-contained
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is open source and available under the [MIT License](LICENSE).
 
 ## Author
 
