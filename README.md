@@ -76,7 +76,7 @@ This project is open source and available under the MIT License.
 
 ## Author
 
-Created by bt1142msstate
+Created by Brandon Temple
 
 ## Contributing
 
