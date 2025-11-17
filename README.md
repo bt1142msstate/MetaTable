@@ -29,8 +29,20 @@ MetaTable extracts the following information for each file:
 
 ## System Requirements
 
-- Windows 10/11
-- .NET 9.0 Runtime (or use the self-contained executable)
+- **OS**: Windows 10 (version 1809 or later) / Windows 11
+- **Runtime**: .NET 9.0 Runtime (or use the self-contained executable)
+- **Disk Space**: ~100 MB for installation
+- **Memory**: 512 MB RAM minimum
+
+## Installation
+
+### Option 1: Self-Contained Executable (Recommended)
+1. Download the latest release from the [Releases](https://github.com/bt1142msstate/MetaTable/releases) page
+2. Extract the ZIP file to your desired location
+3. Run `MetaTable.exe` - no .NET installation required!
+
+### Option 2: Build from Source
+See the [Building from Source](#building-from-source) section below.
 
 ## Usage
 
@@ -48,13 +60,22 @@ MetaTable extracts the following information for each file:
 
 ## Building from Source
 
+### Prerequisites
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/) (optional, but recommended)
+
+### Build Steps
+
 ```powershell
 # Clone the repository
 git clone https://github.com/bt1142msstate/MetaTable.git
 cd MetaTable
 
+# Restore dependencies
+dotnet restore
+
 # Build the project
-dotnet build
+dotnet build -c Release
 
 # Run the application
 dotnet run --project MetaTable/MetaTable.csproj
@@ -62,17 +83,88 @@ dotnet run --project MetaTable/MetaTable.csproj
 
 ### Publishing a Release Build
 
+Create a self-contained, single-file executable for distribution:
+
 ```powershell
-# Create a self-contained, single-file executable
-dotnet publish MetaTable/MetaTable.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+dotnet publish MetaTable/MetaTable.csproj `
+  -c Release `
+  -r win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  -o publish
 ```
+
+The executable will be in the `publish` folder.
 
 ## Technology Stack
 
-- **Framework**: .NET 9.0
+- **Framework**: [.NET 9.0](https://dotnet.microsoft.com/)
 - **UI**: WPF (Windows Presentation Foundation)
-- **Excel Export**: EPPlus
-- **Language**: C#
+- **Excel Export**: [EPPlus](https://www.nuget.org/packages/EPPlus/)
+- **Language**: C# 12
+
+## Project Structure
+
+```
+MetaTable/
+├── MetaTable/              # Main application project
+│   ├── MainWindow.xaml     # UI layout
+│   ├── MainWindow.xaml.cs  # Application logic
+│   ├── App.xaml            # Application resources
+│   ├── Logo.ico            # Application icon
+│   └── MetaTable.csproj    # Project file
+├── screenshots/            # Application screenshots
+├── Standalone/             # Batch launchers
+├── LICENSE                 # MIT License
+├── README.md               # This file
+├── CONTRIBUTING.md         # Contribution guidelines
+└── CHANGELOG.md            # Version history
+```
+
+## Customization
+
+### Changing the Branding
+
+To customize the MSU branding:
+
+1. **Icon**: Replace `MetaTable/Logo.ico` with your own icon
+2. **Colors**: Edit the color values in `MainWindow.xaml`:
+   - Primary color: `#660000` (maroon)
+   - Accent color: `#4A9EFF` (blue)
+   - Background: `#1E1E1E` (dark gray)
+3. **Window Title**: Change `Title` property in `MainWindow.xaml`
+
+## Troubleshooting
+
+### Application won't start
+- Ensure you have .NET 9.0 Runtime installed (or use the self-contained version)
+- Try running as administrator
+- Check Windows Event Viewer for error details
+
+### Excel file won't open
+- Ensure you have Microsoft Excel or a compatible spreadsheet application installed
+- Check that the output path is writable
+- Verify the file isn't open in another application
+
+### Scan is very slow
+- Large directories with many files will take time
+- Network drives are slower than local drives
+- Consider scanning smaller subdirectories
+
+## Frequently Asked Questions
+
+**Q: Can I scan network drives?**  
+A: Yes, but performance may be slower depending on network speed.
+
+**Q: What's the maximum number of files it can handle?**  
+A: There's no hard limit, but very large scans (100,000+ files) may take significant time and memory.
+
+**Q: Can I customize what metadata is captured?**  
+A: Yes! Modify the scanning logic in `MainWindow.xaml.cs` to add or remove metadata fields.
+
+**Q: Does it work with Excel Online or Google Sheets?**  
+A: The output is a standard .xlsx file that can be opened in Excel Online, Google Sheets, LibreOffice, etc.
 
 ## License
 
@@ -84,4 +176,29 @@ Created by Brandon Temple
 
 ## Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
+Contributions, issues, and feature requests are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+Feel free to check the [issues page](https://github.com/bt1142msstate/MetaTable/issues) for open issues or to submit new ones.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed version history.
+
+## Acknowledgments
+
+- Built with [WPF](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/)
+- Excel export powered by [EPPlus](https://www.eppluspoftware.com/)
+- Inspired by the need for simple, efficient file metadata analysis
+
+## Support
+
+If you find this project helpful, please consider:
+- ⭐ Starring the repository
+- 🐛 Reporting bugs
+- 💡 Suggesting new features
+- 🔀 Contributing code
+
+---
+
+**Made with ❤️ for the file management community**
+
